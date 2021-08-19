@@ -4,12 +4,7 @@ const router = express.Router();
 const db = require("../db/models");
 const { Tweet } = db;
 const {check, validationResult} = require('express-validator');
-
-const asyncHandler = (handler) => {
-    return (req, res, next) => {
-        return handler(req, res, next).catch(next)
-    }
-}
+const {asyncHandler, handleValidationErrors} = require('./utils.js')
 
 router.get("/", asyncHandler(async(req, res, next) => {
     const tweets = await Tweet.findAll()
@@ -34,19 +29,14 @@ const tweetValidators = [
         .withMessage('Message cannot exceed 280 characters')
 ]
 
-const handleValidationErrors = (req, res, next) => {
-    const validationErrors = validationResult(req);
-    if(!validationErrors.isEmpty()){
-        const errors = validationErrors.array().map((error) => error.msg);
-
-        const err = Error("Bad request.");
-        err.errors = errors;
-        err.status = 400;
-        err.title = "Bad request.";
-        return next(err);
-    }
-    next();
+function tweetNotFoundError(tweetId) {
+    const error = new Error(`Tweet ${tweetId} was not found!`);
+    error.status = 404;
+    error.title = 'tweetNotFoundError';
+    return error;
 }
+
+
 
 router.post("/", tweetValidators, handleValidationErrors, asyncHandler(async(req, res, next) => {
     const {message} = req.body;
@@ -74,13 +64,5 @@ router.delete("/:id(\\d+)", asyncHandler(async(req, res, next) => {
         next(tweetNotFoundError(tweetId));
     }
 }));
-
-function tweetNotFoundError(tweetId) {
-   const error = new Error(`Tweet ${tweetId} was not found!`);
-   error.status = 404;
-   error.title = 'tweetNotFoundError';
-   return error;
-}
-
 
 module.exports = router;
