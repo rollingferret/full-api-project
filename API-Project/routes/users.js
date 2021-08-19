@@ -4,8 +4,7 @@ const { check } = require("express-validator");
 const { asyncHandler, handleValidationErrors } = require("./utils");
 const bcrypt = require('bcryptjs');
 const db = require("../db/models");
-const User = require("../db/models/user.js");
-
+const getUserToken = require("../auth.js")
 
 const validateUsername =
   check("username")
@@ -23,21 +22,18 @@ const validateEmailAndPassword = [
 ];
 
 
-
 router.post("/", validateUsername, validateEmailAndPassword, handleValidationErrors, asyncHandler(async(req, res, next) => {
 
-   const { username, email, password } = req.body;
-   //todo create user
-   const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await db.User.create({ username, email, hashedPassword});
+  const { username, email, password } = req.body;
+  //todo create user
+  const hashedPassword = await bcrypt.hash(password, 2);
+  const user = await db.User.create({ username, email, hashedPassword});
 
-//    const hashedPassword = await bcrypt.hash(password, 10);
-//    const user = await User.create({
-//        username, email, hashedPassword
-//    })
-//    const token = getToken(user);
-
-//    res.json({user: username, token})
-}))
+  const token = getUserToken(user);
+  res.status(201).json({
+    user: { id: user.id },
+    token,
+  });
+}));
 
 module.exports = router;
