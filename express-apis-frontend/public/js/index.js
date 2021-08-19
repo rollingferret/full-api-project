@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
       const res = await fetch("http://localhost:8080/tweets");
       if(res.status === 401){
-        // res.redirect('/log-in');
-        window.location.href = '/log-in';
+        res.redirect('/log-in');
+        // window.location.href = '/log-in';
         return;
       } else {
         const { tweets } = await res.json();

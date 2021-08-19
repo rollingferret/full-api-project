@@ -5,6 +5,10 @@ const db = require("../db/models");
 const { Tweet } = db;
 const {check, validationResult} = require('express-validator');
 const {asyncHandler, handleValidationErrors} = require('./utils.js')
+const { requireAuth } = require("../auth");
+
+router.use(requireAuth);
+
 
 router.get("/", asyncHandler(async(req, res, next) => {
     const tweets = await Tweet.findAll()

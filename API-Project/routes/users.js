@@ -4,7 +4,7 @@ const { check } = require("express-validator");
 const { asyncHandler, handleValidationErrors } = require("./utils");
 const bcrypt = require('bcryptjs');
 const db = require("../db/models");
-const getUserToken = require("../auth.js")
+const { getUserToken } = require("../auth.js")
 
 const validateUsername =
   check("username")
