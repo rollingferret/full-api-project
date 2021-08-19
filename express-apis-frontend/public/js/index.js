@@ -2,10 +2,15 @@
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-      const res = await fetch("http://localhost:8080/tweets");
+      const res = await fetch("http://localhost:8080/tweets", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem(
+            "TWITTER_LITE_ACCESS_TOKEN"
+          )}`,
+        },
+      });
       if(res.status === 401){
-        res.redirect('/log-in');
-        // window.location.href = '/log-in';
+        window.location.href = "/log-in";
         return;
       } else {
         const { tweets } = await res.json();
